@@ -1,0 +1,43 @@
+# 忽略编译生成的二进制文件
+/bin/
+/obj/
+/lib/
+*.o
+*.so
+*.a
+*.exe
+
+# 忽略临时文件
+*.log
+*.tmp
+*.swp
+*.swo
+*.bak
+*.dmp
+
+# 忽略构建文件夹（如CMake生成的文件）
+/build/
+/CMakeFiles/
+/CMakeCache.txt
+Makefile
+cmake_install.cmake
+
+# 忽略操作系统生成的文件
+.DS_Store
+Thumbs.db
+*.~, ~*
+
+# 忽略 IDE/编辑器生成的文件
+/.idea/
+/.vscode/
+*.iml
+*.user
+*.suo
+*.db
+*.opendb
+*.VC.db
+
+# 忽略版本控制文件夹
+.git/
+.hg/
+.svn/

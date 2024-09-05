@@ -24,6 +24,7 @@ set(SRC_CPP
     src/config.cpp
     src/thread.cpp
     src/config.cpp
+    src/fiber.cpp
 )
 
 # 生成sake库
@@ -37,6 +38,13 @@ add_dependencies(test_thread sake)
 add_executable(test_config ${PROJECT_SOURCE_DIR}/test/test_config.cpp)
 add_dependencies(test_config sake)
 
+# 生成测试可执行文件 test_util
+add_executable(test_util ${PROJECT_SOURCE_DIR}/test/test_util.cpp)
+add_dependencies(test_util sake)
+
+# 生成测试可执行文件 test_fiber
+add_executable(test_fiber ${PROJECT_SOURCE_DIR}/test/test_fiber.cpp)
+add_dependencies(test_fiber sake)
 set(LIB_LIB
     sake
     pthread
@@ -46,3 +54,5 @@ set(LIB_LIB
 # 链接依赖库
 target_link_libraries(test_thread ${LIB_LIB})
 target_link_libraries(test_config ${LIB_LIB})
+target_link_libraries(test_util ${LIB_LIB})
+target_link_libraries(test_fiber ${LIB_LIB})

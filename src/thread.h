@@ -260,7 +260,8 @@ namespace sake
 
         void lock()
         {
-            while (std::atomic_flag_test_and_set_explicit(&m_mutex, std::memory_order_acquire));
+            while (std::atomic_flag_test_and_set_explicit(&m_mutex, std::memory_order_acquire))
+                ;
         }
 
         void unlock()

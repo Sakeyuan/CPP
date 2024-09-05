@@ -63,6 +63,15 @@ namespace sake
         }
     };
 
+    class ThreadNameFormatItem : public LogFormatter::FormatItem
+    {
+    public:
+        ThreadNameFormatItem(const std::string &str = "") {}
+        void format(std::ostream &os, std::shared_ptr<Logger> logger, LogLevel::Level level, LogEvent::ptr event) override
+        {
+            os << event->getThreadName();
+        }
+    };
     class DateTimeFormatItem : public LogFormatter::FormatItem
     {
     public:
@@ -160,11 +169,11 @@ namespace sake
 
     Logger::Logger(const std::string name) : m_name(name), m_level(LogLevel::DEBUG)
     {
-        m_formatter.reset(new LogFormatter("%d{%Y-%m-%d %H:%M:%S}%T[%p]%T[%c]%T%t%T%F%T%f:%l%T%m%n"));
+        m_formatter.reset(new LogFormatter("%d{%Y-%m-%d %H:%M:%S}%T%t%T%N%T%F%T[%p]%T[%c]%T%f:%l%T%m%n"));
     }
 
-    LogEvent::LogEvent(std::shared_ptr<Logger> logger, LogLevel::Level level, const char *file, int32_t line, uint64_t elapse, uint32_t thread_id, uint32_t fiber_id, uint64_t time)
-        : m_file(file), m_line(line), m_elapse(elapse), m_threadId(thread_id), m_fiberId(fiber_id), m_time(time), m_logger(logger), m_level(level)
+    LogEvent::LogEvent(std::shared_ptr<Logger> logger, LogLevel::Level level, const char *file, int32_t line, uint64_t elapse, uint32_t thread_id, uint32_t fiber_id, uint64_t time, const std::string &thread_name)
+        : m_file(file), m_line(line), m_elapse(elapse), m_threadId(thread_id), m_fiberId(fiber_id), m_time(time), m_threadName(thread_name), m_logger(logger), m_level(level)
     {
     }
 
@@ -566,17 +575,18 @@ namespace sake
         #str, [](const std::string &fmt) { return FormatItem::ptr(new C(fmt)); } \
     }
 
-            XX(m, MessageFormatItem),
-            XX(p, LevelFormatItem),
-            XX(r, ElapseFormatItem),
-            XX(c, NameFormatItem),
-            XX(t, ThreadIdFormatItem),
-            XX(n, NewLineFormatItem),
-            XX(d, DateTimeFormatItem),
-            XX(f, FileNameFormatItem),
-            XX(l, LineFormatItem),
-            XX(T, TabFormatItem),
-            XX(F, FiberFormatItem)
+            XX(m, MessageFormatItem),   // p: 消息
+            XX(p, LevelFormatItem),     // r: 日志级别
+            XX(r, ElapseFormatItem),    // c: 累计毫秒数
+            XX(c, NameFormatItem),      // t: 日志名称
+            XX(t, ThreadIdFormatItem),  // n: 线程ID
+            XX(n, NewLineFormatItem),   // n: 回车
+            XX(d, DateTimeFormatItem),  // d: 时间
+            XX(f, FileNameFormatItem),  // f: 文件名
+            XX(l, LineFormatItem),      // l: 行号
+            XX(T, TabFormatItem),       // T: Tab
+            XX(F, FiberFormatItem),     // F: 协程ID
+            XX(N, ThreadNameFormatItem) // N: 协程名称
 
 #undef XX
         };

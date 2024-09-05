@@ -23,7 +23,7 @@
 
 #define SAKE_LOG_LEVEL(logger, level) \
     if (logger->getLevel() <= level)  \
-    sake::LogEventWrap(sake::LogEvent::ptr(new sake::LogEvent(logger, level, __FILE__, __LINE__, 0, sake::util::GetThreadId(), sake::util::GetFiberId(), time(0)))).getSS()
+    sake::LogEventWrap(sake::LogEvent::ptr(new sake::LogEvent(logger, level, __FILE__, __LINE__, 0, sake::util::GetThreadId(), sake::util::GetFiberId(), time(0), sake::Thread::GetName()))).getSS()
 
 #define SAKE_LOG_DEBUG(logger) SAKE_LOG_LEVEL(logger, sake::LogLevel::Level::DEBUG)
 #define SAKE_LOG_INFO(logger) SAKE_LOG_LEVEL(logger, sake::LogLevel::Level::INFO)
@@ -31,11 +31,11 @@
 #define SAKE_LOG_ERROR(logger) SAKE_LOG_LEVEL(logger, sake::LogLevel::Level::ERROR)
 #define SAKE_LOG_FATAL(logger) SAKE_LOG_LEVEL(logger, sake::LogLevel::Level::FATAL)
 
-#define SAKE_LOG_FMT_LEVEL(logger, level, fmt, ...)                                                               \
-    if (logger->getLevel() <= level)                                                                              \
-    sake::LogEventWrap(sake::LogEvent::ptr(new sake::LogEvent(logger, level, __FILE__, __LINE__, 0,               \
-                                                              sake::GetThreadId(), sake::GetFiberId(), time(0)))) \
-        .getEvent()                                                                                               \
+#define SAKE_LOG_FMT_LEVEL(logger, level, fmt, ...)                                                                                        \
+    if (logger->getLevel() <= level)                                                                                                       \
+    sake::LogEventWrap(sake::LogEvent::ptr(new sake::LogEvent(logger, level, __FILE__, __LINE__, 0,                                        \
+                                                              sake::GetThreadId(), sake::GetFiberId(), time(0), sake::Thread::GetName()))) \
+        .getEvent()                                                                                                                        \
         ->format(fmt, __VA_ARGS__)
 
 #define SAKE_LOG_FMT_DEBUG(logger, fmt, ...) SAKE_LOG_FMT_LEVEL(logger, sake::LogLevel::Level::DEBUG, fmt, __VA_ARGS__)
@@ -80,7 +80,7 @@ namespace sake
     {
     public:
         typedef std::shared_ptr<LogEvent> ptr;
-        LogEvent(std::shared_ptr<Logger> logger, LogLevel::Level level, const char *file, int32_t line, uint64_t elapse, uint32_t thread_id, uint32_t fiber_id, uint64_t time);
+        LogEvent(std::shared_ptr<Logger> logger, LogLevel::Level level, const char *file, int32_t line, uint64_t elapse, uint32_t thread_id, uint32_t fiber_id, uint64_t time, const std::string &thread_name);
 
         const char *getFile() const { return m_file; }
         int32_t getLine() const { return m_line; }
@@ -90,7 +90,7 @@ namespace sake
         uint64_t getTime() const { return m_time; }
         std::string getContent() const { return m_ss.str(); }
         std::stringstream &getSS() { return m_ss; }
-
+        const std::string &getThreadName() const { return m_threadName; }
         std::shared_ptr<Logger> getLogger() { return m_logger; }
         LogLevel::Level getLevel() { return m_level; }
 
@@ -110,6 +110,8 @@ namespace sake
         uint32_t m_fiberId = 0;
         // 时间
         uint64_t m_time = 0;
+        // 线程名称
+        std::string m_threadName;
         // 消息
         std::stringstream m_ss;
         // 日志器
